@@ -1,0 +1,43 @@
+// create a population of 500 individuals
+//1 {
+//	sim.addSubpop("p1", 500);
+//}
+
+
+//1 early() {
+//	// start from two bacteria with different beneficial mutations
+//	sim.addSubpop("p1", 2);
+//
+//	// add beneficial mutations to each bacterium, but at different loci
+//	g = p1.individuals.genome1;
+//	g[0].addNewDrawnMutation(m2, asInteger(G * 0.25));
+//	g[1].addNewDrawnMutation(m2, asInteger(G * 0.75));
+//}
+
+//early() {
+//	// density-dependent population regulation
+//	p1.fitnessScaling = K / p1.individualCount;
+//}
+
+
+
+
+late() {
+	// detect fixation/loss of the beneficial mutations
+	muts = sim.mutations;
+	freqs = sim.mutationFrequencies(NULL, muts);
+
+	if (all(freqs == 0.5))
+	{
+		catn(sim.generation + ": " + sum(freqs == 0.5) + " fixed.");
+		sim.simulationFinished();
+	}
+}
+
+// output samples of 10 genomes periodically, all fixed mutations at end
+//1000 late() { p1.outputSample(10); }
+//2000 late() { p1.outputSample(10); }
+//2000 late() { sim.outputFixedMutations(); }
+
+
+//100000 late() { catn(sim.generation + ": no result."); }
