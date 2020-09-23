@@ -1,0 +1,47 @@
+// Keywords: nonWF, non-Wright-Fisher, clonal, haploid
+
+initialize() {
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", population_size);	// carrying capacity
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	initializeMutationType("m2", 0.5, "f", beneficial_s); // beneficial DFE
+  initializeMutationType("m3", 0.5, "f", deleterious_s); // deleterious DFE
+	//initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElementType("g1", c(m1, m2, m3), c(proportion_n, proportion_b, proportion_d));
+	initializeGenomicElement(g1, 0, genome_size-1);
+	initializeMutationRate(per_base_u);
+	initializeRecombinationRate(per_base_r);
+
+  print(file_out);
+
+}
+reproduction() {
+	subpop.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
+}
+1 early() {
+	sim.addSubpop("p1", K);
+  sim.rescheduleScriptBlock(s1, generations, generations);
+}
+early() {
+
+	// remove any new mutations added to the disabled diploid genomes
+	//sim.subpopulations.individuals.genome2.removeMutations();
+
+	// remove neutral mutations in the haploid genomes that have fixed
+	muts = c(sim.mutationsOfType(m1), sim.mutationsOfType(m2), sim.mutationsOfType(m3));
+	freqs = sim.mutationFrequencies(NULL, muts);
+
+	if (any(freqs == 0.5))
+		sim.subpopulations.genomes.removeMutations(muts[freqs == 0.5], T);
+
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+//1 {
+//	sim.addSubpop("p1", N);
+//	sim.rescheduleScriptBlock(s1, 10*N, 10*N);
+
+
+//s1 100 late() { sim.outputFixedMutations(); }
+
+s1 10 late() { sim.outputFull(filePath=file_out); }
