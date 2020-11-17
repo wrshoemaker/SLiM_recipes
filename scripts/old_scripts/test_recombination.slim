@@ -12,16 +12,17 @@ initialize() {
 	initializeMutationRate(per_base_u);
 	initializeRecombinationRate(per_base_r);
 
-  print(file_out);
-
 }
+
 reproduction() {
 	subpop.addRecombinant(genome1, NULL, NULL, NULL, NULL, NULL);
 }
+
 1 early() {
 	sim.addSubpop("p1", K);
   sim.rescheduleScriptBlock(s1, generations, generations);
 }
+
 early() {
 
 	// remove any new mutations added to the disabled diploid genomes
@@ -42,6 +43,5 @@ early() {
 //	sim.rescheduleScriptBlock(s1, 10*N, 10*N);
 
 
-//s1 100 late() { sim.outputFixedMutations(); }
 
-s1 10 late() { sim.outputFull(filePath=file_out); }
+s1 late() { sim.outputFull(filePath=file_out); }

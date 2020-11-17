@@ -1,14 +1,13 @@
 import os
 import argparse
+import config
 
-slim_script = 'test_recombination.slim'
+import slim_utils
 
-if os.geteuid() == 501:
-    directory = os.path.expanduser("~/GitHub/slim_recipes/")
 
-else:
-    directory = os.path.expanduser("/u/project/ngarud/wrshoema/slim_recipes/")
+slim_script = 'WF_ConstantSize_Selection.slim'
 
+directory = config.directory
 
 parser = argparse.ArgumentParser()
 
@@ -16,8 +15,8 @@ parser.add_argument('--generations', required=True, type=int)
 parser.add_argument('--genome_size', required=True, type=int)
 parser.add_argument('--population_size', required=True, type=int)
 
-parser.add_argument('--per_base_mutation_rate', required=False, type=float, default=1e-6)
-parser.add_argument('--per_base_recombination_rate', required=False, type=float, default=1e-6)
+parser.add_argument('--per_base_mutation_rate', required=False, type=float, default=1e-8)
+parser.add_argument('--per_base_recombination_rate', required=False, type=float, default=1e-7)
 
 parser.add_argument('--beneficial_selection_coefficient', required=False, type=float, default=0.001)
 parser.add_argument('--deleterious_selection_coefficient', required=False, type=float, default=-0.001)
@@ -43,13 +42,18 @@ proportion_d = args.proportion_deleterious_sites
 proportion_n = args.proportion_neutral_sites
 
 # extremely annoying, but to use % syntax with slim you have to have the outfile  in double parentheses and then single parentheses
-file_out = "'%stest_out2.txt'" % directory
+file_out = "'%stest_out3.txt'" % directory
 
-slim_line = 'slim -d generations=%d -d population_size=%d -d genome_size=%d -d per_base_u=%f -d per_base_r=%f -d beneficial_s=%f -d deleterious_s=%f -d proportion_b=%f -d proportion_d=%f -d proportion_n=%f -d "file_out=%s" %stest_recombination.slim' % (generations, population_size, genome_size, per_base_u, per_base_r, beneficial_s, deleterious_s, proportion_b, proportion_d, proportion_n, file_out, directory)
+#slim_line = 'slim -d generations=%d -d population_size=%d -d genome_size=%d -d per_base_u=%f -d per_base_r=%f -d beneficial_s=%f -d deleterious_s=%f -d proportion_b=%f -d proportion_d=%f -d proportion_n=%f -d "file_out=%s" %stest_recombination.slim' % (generations, population_size, genome_size, per_base_u, per_base_r, beneficial_s, deleterious_s, proportion_b, proportion_d, proportion_n, file_out, directory)
 #slim_line = 'slim -d generations=%d -d population_size=%d -d genome_size=%d -d per_base_u=%f -d per_base_r=%f -d beneficial_s=%f -d deleterious_s=%f -d proportion_b=%f -d proportion_d=%f -d proportion_n=%f %stest_recombination.slim' % (generations, population_size, genome_size, per_base_u, per_base_r, beneficial_s, deleterious_s, proportion_b, proportion_d, proportion_n, directory)
 
+slim_line = 'slim -d generations={} -d population_size={} -d genome_size={} -d  per_base_u={} -d per_base_r={} -d beneficial_s={} -d deleterious_s={} -d proportion_b={} -d proportion_d={} -d proportion_n={} -d file_out="{}"  {}test_recombination.slim'.format(generations, population_size, genome_size, per_base_u, per_base_r, beneficial_s, deleterious_s, proportion_b, proportion_d, proportion_n, file_out, directory)
 
-print(slim_line)
+
+
+#print(slim_line)
+
+#slim_utils.
 
 os.system(slim_line)
 
@@ -76,3 +80,16 @@ os.system(slim_line)
 #6: subpopulation ID
 #7 generation where it originated
 #8: mutation prevalence=count of the number of times that it occurs in any genome in the population.
+
+
+# Individuals section of file
+#0: individual ID
+#1: sex
+#2: Genome specifiers, p1:0 (indicating the 0th genome in p1).
+#3: second genome, since slim makes us simulate diploids.
+#4: number of individuals
+
+# genomes section of file
+#0: genome specifier, such as p1:0
+#1: type of genome: an A for an autosome
+#2: list of within-file mutation identifiers,as given in the Mutations section
